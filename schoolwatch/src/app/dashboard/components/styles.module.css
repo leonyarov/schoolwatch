@@ -1,0 +1,56 @@
+.sidebar{
+    /* width: 280px; */
+    height: 100vh;
+    grid-area: sidebar;
+}
+
+.sidebar a:hover{
+    /* background  hover tint animation */
+    background: #d5d5d5;
+    /* filter: brightness(1.2); */
+
+}
+
+.content{
+    grid-area: content;
+    
+}
+.wrapper{
+    display: grid;
+    grid-template-areas:
+      "header"
+      "nav"
+      "sidebar"
+      "content"
+      "ad"
+      "footer";
+}
+
+
+@media (min-width: 500px) {
+    .wrapper{
+        grid-template-columns: 1fr 3fr;
+        grid-template-areas:
+        "header  header"
+        "nav     nav"
+        "sidebar content"
+        "ad      footer";
+    }
+    
+}
+
+@media (max-width: 500px) {
+    .wrapper{
+        grid-template-columns: 1fr 3fr;
+        grid-template-areas:
+        "header  header"
+        "nav     nav"
+        "content sidebar"
+        "ad      footer";
+    }
+    
+}
+
+.nav_hover:hover{
+    cursor: pointer;
+}

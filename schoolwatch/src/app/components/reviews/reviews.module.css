@@ -1,0 +1,28 @@
+.back{
+
+    background-color: var(--med);
+}
+
+.review{
+    background-color: var(--light);
+
+}
+
+
+.reviews{
+    list-style-type: none;
+
+}
+.review:nth-child(even){
+    margin-left: 10%;
+}
+.review:nth-child(odd){
+    margin-right: 10%;
+}
+.review:nth-child(even){
+    flex-direction: row-reverse;
+}
+
+.par{
+    word-break: break-all;
+}

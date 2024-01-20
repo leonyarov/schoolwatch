@@ -1,0 +1,273 @@
+"use client"
+import { useEffect, useState, useRef, use } from 'react';
+import { Loading } from '@/app/components/loading/Loading';
+import { Modal, Button, Form } from 'react-bootstrap';
+import { GoBack } from '@/app/components/GoBack';
+import { useSearchParams } from 'next/navigation';
+
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import { datetime, RRule, RRuleSet, rrulestr } from 'rrule'
+import dynamic from 'next/dynamic';
+
+//https://github.com/jkbrzt/rrule#rrulesetprototypeexdatedt
+
+
+
+
+import { SchedulerData, ViewType, DATE_FORMAT } from "react-big-schedule";
+const Scheduler = dynamic(() => import('react-big-schedule').then((module) => module.Scheduler), { ssr: false });
+
+import dayjs from "dayjs";
+import "react-big-schedule/dist/css/style.css";
+import { render } from 'react-dom';
+
+export default function Page() {
+
+    const id = useSearchParams().get('id')
+
+    const [loading, setLoading] = useState(true)
+    const [showEventModal, setShowEventModal] = useState(false)
+    const [user, setUser] = useState({})
+
+    const [time, setTime] = useState([dayjs().format('HH:mm'), dayjs().add(1, 'hour').format('HH:mm')]);
+    const [title, setTitle] = useState('Available');
+    const [color, setColor] = useState('#244aff');
+    // const [rrule, setRrule] = useState({
+    //     freq: RRule.WEEKLY,
+    //     interval: 5,
+    //     byweekday: [RRule.MO, RRule.FR],
+    //     dtstart: datetime(2012, 2, 1, 10, 30),
+    //     until: datetime(2012, 12, 31)
+    // })
+
+    const schedulerData = new SchedulerData(new dayjs().format(DATE_FORMAT), ViewType.Week, false, false, {
+        responsiveByParent: true,
+        schedulerWidth: '100%',
+        besidesWidth: 20,
+        dragAndDropEnabled: false,
+    });
+    schedulerData.setSchedulerLocale('he-IL');
+    schedulerData.setCalendarPopoverLocale('he_IL');
+
+    const schedulerParent = useRef(null);
+
+
+    const resources = [
+        { id: 'r1', name: 'Available' },
+    ]
+
+    schedulerData.setResources(resources);
+
+    const events = [
+        {
+            id: 1,
+            start: '2023-12-18 09:30:00',
+            end: '2023-12-19 23:30:00',
+            resourceId: 'r1',
+            title: 'I am finished',
+            bgColor: '#D9D9D9',
+        },
+        {
+            id: 2,
+            start: '2023-12-18 12:30:00',
+            end: '2023-12-26 23:30:00',
+            resourceId: 'r1',
+            title: 'I am not resizable',
+            resizable: false,
+        },
+        {
+            id: 3,
+            start: '2023-12-19 12:30:00',
+            end: '2023-12-20 23:30:00',
+            resourceId: 'r1',
+            title: 'I am not movable',
+            movable: false,
+        },
+        {
+            id: 4,
+            start: '2023-12-19 14:30:00',
+            end: '2023-12-20 23:30:00',
+            resourceId: 'r1',
+            title: 'I am not start-resizable',
+            startResizable: false,
+        },
+        {
+            id: 5,
+            start: '2023-12-19 15:30:00',
+            end: '2023-12-20 23:30:00',
+            resourceId: 'r1',
+            title: 'R2 has recurring tasks every week on Tuesday, Friday',
+            rrule: 'FREQ=WEEKLY;DTSTART=20221219T013000Z;BYDAY=TU,FR',
+            bgColor: '#f666',
+        },
+    ]
+
+    schedulerData.setEvents(events);
+
+    const [viewModel, setViewModel] = useState(schedulerData)
+
+    const handleClose = () => {
+        setShowEventModal(false)
+    }
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        fetch(`/api/payment?id=${user.user_id}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payment)
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                setUserPayments([...userPayments, data])
+                handleClose()
+            })
+    }
+
+    const handleDelete = (id) => {
+        fetch(`/api/payment?id=${user.user_id}&payment_id=${id}`, {
+            method: 'DELETE',
+        })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data)
+                setUserPayments(userPayments.filter(payment => payment.payment_id !== id))
+            })
+    }
+    const handleCreateClick = () => {
+        // Handle create event logic here
+    };
+
+
+    useEffect(() => {
+        setLoading(true)
+        // fetch(`/api/payment?id=${id}`, { method: 'GET' })
+        //     .then(res => res.json())
+        //     .then(data => {
+        //         console.log(data)
+        //         setUserPayments(data.payments)
+        //         delete data.payments
+        //         setUser(data)
+        //     })
+        //     .finally(() => setLoading(false))
+    }, [])
+
+
+    const prevClick = (schedulerData) => {
+        schedulerData.prev();
+        schedulerData.setEvents(events)
+        setViewModel(schedulerData);
+    }
+    const nextClick = (schedulerData) => {
+        schedulerData.next();
+        schedulerData.setEvents(events)
+        setViewModel(schedulerData)
+    }
+
+    const onViewChange = (schedulerData, view) => {
+        schedulerData.setViewType(view.viewType, view.showAgenda, view.isEventPerspective);
+        schedulerData.setEvents(events)
+        setViewModel(schedulerData)
+
+    }
+
+    const onSelectDate = (schedulerData, date) => {
+        schedulerData.setDate(date);
+        schedulerData.setEvents(events)
+        setViewModel(schedulerData)
+
+    }
+
+    const newEvent = (schedulerData, slotId, slotName, start, end, type, item) => {
+        // if (confirm(`Do you want to create a new event? {slotId: ${slotId}, slotName: ${slotName}, start: ${start}, end: ${end}, type: ${type}, item: ${item}}`)) {
+
+        //     let newFreshId = 0;
+        //     schedulerData.events.forEach((item) => {
+        //         if (item.id >= newFreshId)
+        //             newFreshId = item.id + 1;
+        //     });
+
+        //     let newEvent = {
+        //         id: newFreshId,
+        //         title: 'New event you just created',
+        //         start: start,
+        //         end: end,
+        //         resourceId: slotId,
+        //         bgColor: 'purple'
+        //     }
+        //     schedulerData.addEvent(newEvent);
+        //     setViewModel(schedulerData)
+        // }
+
+        setShowEventModal(true)
+    }
+
+    return <section >
+        <GoBack />
+        <h1>Calendar</h1>
+        <h2>Teacher: { }</h2>
+        <div ref={schedulerParent}>
+            <DndProvider backend={HTML5Backend}>
+                <Scheduler schedulerData={viewModel}
+                    prevClick={prevClick}
+                    nextClick={nextClick}
+                    onSelectDate={onSelectDate}
+                    onViewChange={onViewChange}
+                    parentRef={schedulerParent}
+                    newEvent={newEvent}
+                />
+            </DndProvider>
+        </div>
+
+        <Modal show={showEventModal} onHide={handleClose}>
+            <Modal.Header closeButton>
+                <Modal.Title>Create New Event</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Form>
+                    <form >
+                        <div className="row g-3 mb-3">
+                            <div className="col-auto">
+                                <label htmlFor="label_text" className="form-label">Label Text</label>
+                                <input type="text" defaultValue={title} onChange={(e) => setTitle(e.target.value)} className="form-control" id="label_text" />
+                            </div>
+                        </div>
+                        <div className="row g-3 mb-3">
+                            <div className="col-auto">
+                                <label htmlFor="start_time" className="">Start Time</label>
+                                <input type="time" defaultValue={time[0]} className="form-control" id="start_time" onChange={(e) => setTime(prev => [e.target.value, prev[1]])} />
+                            </div>
+                            <div className="col-auto">
+                                <label htmlFor="end_time" className="">End Time</label>
+                                <input type="time" defaultValue={time[1]} className="form-control" id="end_time" onChange={(e) => setTime(prev => [prev[0], e.target.value])} />
+                            </div>
+                            <div className="col-auto">
+                                <label htmlFor="label_color" className="form-label mb-0">Label Color</label>
+                                <input type="color" className="m-0 form-control form-control-color" id="label_color" defaultValue={color} onChange={(e) => setColor(e.target.value)} />
+                            </div>
+                        </div>
+                    </form>
+                </Form>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Cancel
+                </Button>
+                <Button variant="primary" onClick={handleCreateClick}>
+                    Create
+                </Button>
+            </Modal.Footer>
+        </Modal>
+    </section>
+};
+
+function getToday() {
+    var curr = new Date();
+    curr.setDate(curr.getDate());
+    var date = curr.toISOString().substring(0, 10);
+    return date;
+}

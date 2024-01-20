@@ -1,0 +1,22 @@
+.carousel {
+    height: 50vh;
+    background-color: black;
+}
+
+.back {
+
+    /* min-height: 50vh; */
+    filter: blur(0px);
+    background-color: var(--med);
+}
+
+.text {
+    color: var(--dark);
+}
+@media screen and (max-width: 600px)  {
+    .pangolin{
+        /* width: 100px; */
+        display: none;
+    }
+}
+    

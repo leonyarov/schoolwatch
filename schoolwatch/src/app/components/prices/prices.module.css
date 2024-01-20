@@ -1,0 +1,18 @@
+.total{
+    border-radius: 10px;
+    background-color: var(--med);
+}
+
+.price{
+    background-color: var(--light);
+    border: 2px solid var(--darkgreen);
+    border-radius: 20px;
+}
+
+.back{
+    background-color: var(--green);
+}
+
+.text{
+    color: var(--dark);
+}

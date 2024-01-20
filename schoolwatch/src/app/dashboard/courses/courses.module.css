@@ -1,0 +1,12 @@
+.course_select  li:hover {
+    /* drop shadow */
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    /* filter: drop-shadow(0 0 0.05rem #000000); */
+    cursor: pointer;
+
+}
+
+.course_select {
+    /* no bullets */
+    list-style-type: none;
+}

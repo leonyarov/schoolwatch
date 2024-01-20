@@ -1,0 +1,163 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TEACHER
+  STUDENT
+}
+
+enum Currency {
+  USD
+  RUB
+  ILS
+  UAH
+}
+
+model User {
+  user_id       String       @id @default(uuid())
+  parent_name   String?
+  student_name  String?
+  student_age   Int?
+  school_class  Int?
+  phone_number  String?
+  email         String       @unique
+  creation_date DateTime     @default(now())
+  payments      Payment[]
+  password      String       @unique
+  active        Boolean      @default(true)
+  Teaching      Course[]
+  role          Role         @default(STUDENT)
+  avatar        String?
+  Enrollment    Enrollment[]
+  balance       Balance?
+  Completion    Completion[]
+}
+
+model Lesson {
+  lesson_id     String       @id @default(uuid())
+  course_id     String
+  name          String
+  creation_date DateTime     @default(now())
+  lesson_date   DateTime     @default(now())
+  course        Course       @relation(fields: [course_id], references: [course_id])
+  grade         Int?
+  given         Boolean      @default(false)
+  homework      Boolean      @default(false)
+  zoom_link     String?
+  lesson_text   String?
+  homework_text String?
+  description   String?
+  Completion    Completion[]
+}
+
+model Exam {
+  exam_id   String     @id @default(uuid())
+  course_id String
+  name      String
+  date      DateTime   @default(now())
+  course    Course     @relation(fields: [course_id], references: [course_id])
+  grade     Int?
+  given     Boolean    @default(false)
+  Question  Question[]
+}
+
+model Question {
+  question_id String   @id @default(uuid())
+  exam_id     String
+  text        String?
+  exam        Exam     @relation(fields: [exam_id], references: [exam_id])
+  answers     Answer[]
+}
+
+model Answer {
+  answer_id   String   @id @default(uuid())
+  question_id String
+  text        String?
+  correct     Boolean  @default(false)
+  question    Question @relation(fields: [question_id], references: [question_id])
+}
+
+model Payment {
+  payment_id String   @id @default(uuid())
+  payer_id   String
+  date       DateTime @default(now())
+  amount     Float
+  currency   Currency @default(ILS)
+  user       User     @relation(fields: [payer_id], references: [user_id])
+}
+
+model Course {
+  course_id     String          @id @default(uuid())
+  teacher_name  String
+  name          String
+  creation_date DateTime        @default(now())
+  lessons       Lesson[]
+  teacher       User            @relation(fields: [teacher_name], references: [user_id])
+  exams         Exam[]
+  rates         CourseRates?
+  Enrollment    Enrollment[]
+  CalendarEvent CalendarEvent[]
+}
+
+model Enrollment {
+  enrollment_id String @id @default(uuid())
+  student_id    String
+  course_id     String
+  course        Course @relation(fields: [course_id], references: [course_id])
+  student       User   @relation(fields: [student_id], references: [user_id])
+
+  @@unique([student_id, course_id])
+}
+
+model CalendarEvent {
+  id         Int     @id
+  course_id  String
+  user_id    String
+  start      String  @default("")
+  end        String  @default("")
+  resourceId String  @default("r1")
+  rrule      String?
+  title      String  @default("Available")
+  resizable  Boolean @default(false)
+  movable    Boolean @default(false)
+  bgColor    String  @default("#244aff")
+  course     Course  @relation(fields: [course_id], references: [course_id])
+}
+
+model CourseRates {
+  id           String @id @default(uuid())
+  course_id    String @unique
+  course       Course @relation(fields: [course_id], references: [course_id])
+  student_rate Float
+  teacher_rate Float
+}
+
+model Balance {
+  id      String @id @default(uuid())
+  user_id String @unique
+  user    User   @relation(fields: [user_id], references: [user_id])
+  balance Float
+}
+
+model Completion {
+  id        String   @id @default(uuid())
+  lesson_id String
+  user_id   String
+  user      User     @relation(fields: [user_id], references: [user_id])
+  lesson    Lesson   @relation(fields: [lesson_id], references: [lesson_id])
+  completed Boolean  @default(false)
+  tarrif    Float    @default(0)
+  date      DateTime @default(now())
+
+  @@unique([user_id, lesson_id])
+}

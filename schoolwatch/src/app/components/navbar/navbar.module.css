@@ -1,0 +1,10 @@
+.navbar {
+    background-color: var(--dark);
+}
+
+.text {
+    
+    color: var(--light) !important;
+}
+
+.login {}

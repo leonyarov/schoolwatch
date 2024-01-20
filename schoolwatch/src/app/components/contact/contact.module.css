@@ -1,0 +1,7 @@
+.contact {
+    border-radius: 20px;
+    background-color: var(--cornsilk);
+    border: 1px solid #c2c1c1;
+    top: -10vh;
+    position: relative;
+}
