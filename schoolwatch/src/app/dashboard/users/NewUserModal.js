@@ -3,6 +3,7 @@ import { useFormState, useFormStatus } from "react-dom";
 import { createUser } from "../../api/actions.js";
 import { useState } from "react";
 import { Modal, Button, Alert } from "react-bootstrap";
+import { SubmitButton } from "@/app/components/SubmitButton.js";
 
 
 export function NewUserModal() {
@@ -28,25 +29,7 @@ export function NewUserModal() {
         state.show = false
     }
 
-    // function handleSubmit(event) {
-    //     event.preventDefault();
-    //     const form = new FormData(event.target);
-    //     const data = Object.fromEntries(form.entries());
-    //     console.log(data);
-    //     fetch('/api/users', {
-    //         method: 'POST',
-    //         body: JSON.stringify(data),
-    //         headers: {
-    //             'Content-Type': 'application/json'
-    //         }
-    //     })
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             setReload(prev => !prev)
-    //             handleClose()
-    //             console.log(data)
-    //         });
-    // }
+
 
     return <>
         <button className="btn btn-primary" onClick={() => setShow(true)}>New User</button>
@@ -59,8 +42,8 @@ export function NewUserModal() {
             <Modal.Header closeButton>
                 <Modal.Title>New User</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-                <form id="new_user" action={formActions}>
+            <form id="new_user" action={formActions}>
+                <Modal.Body>
                     <UserField name="parent_name" label="Parent Name" type="text" />
                     <UserField name="student_name" label="Student Name" />
                     <UserField name="student_age" label="Student Age" type="number" />
@@ -75,21 +58,16 @@ export function NewUserModal() {
                             <option value="TEACHER">Teacher</option>
                         </select>
                     </div>
-                </form>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Close
-                </Button>
-                <SubmitButton />
-            </Modal.Footer>
-        </Modal>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleClose}>
+                        Close
+                    </Button>
+                    <SubmitButton text="Add New" />
+                </Modal.Footer>
+            </form>
+        </Modal >
     </>
 }
 
-function SubmitButton() {
-    const { pending } = useFormStatus()
-    return <Button variant="primary" type="submit" form="new_user" disabled={pending}>
-        Submit
-    </Button>
-}
+

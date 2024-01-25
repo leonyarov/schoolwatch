@@ -3,6 +3,7 @@ import { Modal, Button } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { deleteUser, updateUser } from "@/app/api/actions";
 import { useFormState, useFormStatus } from "react-dom";
+import { SubmitButton } from "@/app/components/SubmitButton";
 
 // import { createUser } from "@/app/api/actions";
 
@@ -39,6 +40,7 @@ export function ViewUserModal({ user, show, setShow }) {
                     <UserField name="school_class" label="School Class" type="number" />
                     <UserField name="phone_number" label="Phone Number" />
                     <UserField name="email" label="Email" />
+                    <UserField name="password" label="Password"/>
 
                     <p className={`badge ${user?.active ? 'bg-success' : 'bg-danger'}`}>
                         {user?.active ? 'Active' : 'Inactive'}
@@ -55,9 +57,11 @@ export function ViewUserModal({ user, show, setShow }) {
                 </Button>
                 <form action={formDelete}>
                     <input type="hidden" name="id" value={user?.user_id} />
-                    <Button variant="danger" type="submit" onClick={handleClose}>
+                    {/* <Button variant="danger" type="submit" onClick={handleClose}>
                         Delete
-                    </Button>
+                    </Button> */}
+
+                    <SubmitButton variant="danger" text="Delete" />
                 </form>
 
                 <Button variant="success" type="submit" form="user_edit" >

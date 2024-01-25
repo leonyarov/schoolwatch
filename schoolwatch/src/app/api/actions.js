@@ -26,13 +26,7 @@ export async function createUser(old, formData) {
                 ...user,
                 creation_date: new Date().toISOString(),
                 active: true,
-                password: password,
-                balance: {
-                    create: {
-                        amount: 0,
-                        currency: "USD"
-                    }
-                }
+                password: password,         
             }
         })
         revalidatePath("/dashboard/users");
