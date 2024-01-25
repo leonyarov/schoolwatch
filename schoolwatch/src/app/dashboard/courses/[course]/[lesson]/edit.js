@@ -102,18 +102,12 @@ export function Edit({ data, lesson, admin = false, teacher = false }) {
                 </form>
 
             </div>
-            <DeleteModal lesson_id={data.lesson_id} />
-            {/* <div className=" bg-body-secondary ms-auto p-3 rounded rounded-3 w-25 ms-5">
-                <div className="hstack ">
-                    <p className="mb-0">Homework</p>
-                    <p className="ms-auto mb-0">0 / 100</p>
-                </div>
-                <div className="hstack my-3">
-                    <button className="btn btn-primary">Upload</button>
-                    <buttton className="btn btn-primary ms-auto" onClick={null}>View All</buttton>
-                    <BootstrapModal show={null} onHide={null} />
-                </div>
-            </div> */}
+
+            {admin ?
+                <DeleteModal lesson_id={data.lesson_id} />
+                : null
+            }
+
         </div >
 
         <form className="bg-body-secondary p-3 rounded rounded-3 mt-3 mb-3" action={updateText}>

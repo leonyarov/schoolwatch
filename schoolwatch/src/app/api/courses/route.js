@@ -161,17 +161,25 @@ export async function deleteCourse(formData) {
             }
         })
 
+        await prisma.enrollment.deleteMany({
+            where: {
+                course_id: data.course_id
+            }
+        })
+
+
+        await prisma.lesson.deleteMany({
+            where: {
+                course_id: data.course_id
+            },
+        })
+
         await prisma.course.delete({
             where: {
                 course_id: data.course_id
             }
         })
 
-        await prisma.enrollment.deleteMany({
-            where: {
-                course_id: data.course_id
-            }
-        })
 
 
         await prisma.lesson.deleteMany({
